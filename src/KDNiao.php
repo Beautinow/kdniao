@@ -48,25 +48,55 @@ class KDNiao
     }
 
     /**
+     * 查询订单物流轨迹
+     * @param $ShipperCode
+     * @param $LogisticCode
+     * @return array $result
+     */
+    public static function getOrderTraces($ShipperCode, $LogisticCode)
+    {
+        $requestData = [
+            'OrderCode' => '',
+            'ShipperCode' => $ShipperCode,
+            'LogisticCode' => $LogisticCode
+        ];
+
+        $requestData = json_encode($requestData, JSON_UNESCAPED_UNICODE);
+
+        $config = self::loadConfig();
+
+        $data = array(
+            'EBusinessID' => $config['businessID'],
+            'RequestType' => '1002',
+            'RequestData' => urlencode($requestData),
+            'DataType' => '2',
+        );
+        $data['DataSign'] = self::encrypt($requestData, $config['apiKey']);
+        $result = self::request($config['queryUrl'], $data);
+
+        return json_decode($result, true);
+    }
+
+
+    /**
      * 调用电子面单接口
      * @param $requestData
+     * @return array $result
      */
     public static function submitEOrder($requestData)
     {
         $config = self::loadConfig();
 
-        $datas = array(
+        $data = array(
             'EBusinessID' => $config['businessID'],
             'RequestType' => '1007',
             'RequestData' => urlencode($requestData),
             'DataType' => '2',
         );
-        $datas['DataSign'] = self::encrypt($requestData, $config['apiKey']);
-        $result = self::request($config['orderUrl'], $datas);
+        $data['DataSign'] = self::encrypt($requestData, $config['apiKey']);
+        $result = self::request($config['orderUrl'], $data);
 
-        //根据公司业务处理返回的信息......
-
-        return $result;
+        return json_decode($result, true);
     }
 
 
