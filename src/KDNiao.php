@@ -17,20 +17,21 @@ class KDNiao
      * 调试模式下，快递鸟电子面单下单接口地址：http://testapi.kdniao.com:8081/api/EOrderService
      * 线上模式下，快递鸟电子面单下单接口地址：http://api.kdniao.com/api/Eorderservice
      *
+     * @param $production 是否正式环境
      * @return array
      */
-    public static function loadConfig()
+    public static function loadConfig($production = true)
     {
         $config = [
             'businessID' => env('KDNIAO_EBUSINESS_ID', null),
             'apiKey' => env('KDNIAO_API_KEY', null),
             'queryUrl' => 'http://api.kdniao.cc/Ebusiness/EbusinessOrderHandle.aspx',
         ];
-        if (env('APP_DEBUG', false)) {
-            $config['subUrl'] = 'http://testapi.kdniao.cc:8081/api/dist';
+        if (env('APP_DEBUG', false) || $production) {
+            $config['subUrl'] = 'http://api.kdniao.cc/api/dist';
             $config['orderUrl'] = 'http://api.kdniao.com/api/Eorderservice';
         } else {
-            $config['subUrl'] = 'http://api.kdniao.cc/api/dist';
+            $config['subUrl'] = 'http://testapi.kdniao.cc:8081/api/dist';
             $config['orderUrl'] = 'http://testapi.kdniao.com:8081/api/EOrderService';
         }
         return $config;
@@ -51,9 +52,10 @@ class KDNiao
      * 查询订单物流轨迹
      * @param $ShipperCode
      * @param $LogisticCode
+     * @param $production
      * @return array $result
      */
-    public static function getOrderTraces($ShipperCode, $LogisticCode)
+    public static function getOrderTraces($ShipperCode, $LogisticCode, $production = true)
     {
         $requestData = [
             'OrderCode' => '',
@@ -63,7 +65,7 @@ class KDNiao
 
         $requestData = json_encode($requestData, JSON_UNESCAPED_UNICODE);
 
-        $config = self::loadConfig();
+        $config = self::loadConfig($production);
 
         $data = array(
             'EBusinessID' => $config['businessID'],
@@ -81,11 +83,12 @@ class KDNiao
     /**
      * 调用电子面单接口
      * @param $requestData
+     * @param $production
      * @return array $result
      */
-    public static function submitEOrder($requestData)
+    public static function submitEOrder($requestData, $production = true)
     {
-        $config = self::loadConfig();
+        $config = self::loadConfig($production);
 
         $data = array(
             'EBusinessID' => $config['businessID'],
