@@ -23,8 +23,8 @@ class KDNiao
     public static function loadConfig($production = true)
     {
         $config = [
-            'businessID' => env('KDNIAO_EBUSINESS_ID', null),
-            'apiKey' => env('KDNIAO_API_KEY', null),
+            'businessID' => config('kdniao.business_id'),
+            'apiKey' => config('kdniao.api_key'),
             'queryUrl' => 'http://api.kdniao.cc/Ebusiness/EbusinessOrderHandle.aspx',
         ];
         if (env('APP_DEBUG', false) || $production) {
